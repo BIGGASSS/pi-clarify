@@ -8,12 +8,13 @@ Use it when you know what you want, but not the exact term or structure.
 ## Install
 
 ```sh
-pi install git:github.com/dodo-reach/pi-clarify
+pi install npm:pi-clarify
 ```
 
 Also valid:
 
 ```sh
+pi install git:github.com/dodo-reach/pi-clarify
 pi install https://github.com/dodo-reach/pi-clarify
 pi install /path/to/pi-clarify
 pi -e git:github.com/dodo-reach/pi-clarify
