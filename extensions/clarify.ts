@@ -16,7 +16,7 @@
  * When no config is set, the current session model is used.
  */
 
-import { complete, type UserMessage } from "@earendil-works/pi-ai/compat";
+import { type UserMessage } from "@earendil-works/pi-ai";
 import {
 	getAgentDir,
 	BorderedLoader,
@@ -138,9 +138,10 @@ async function callModel(
 	ctx: ClarifyUi,
 	signal?: AbortSignal,
 ): Promise<string | null> {
-	const auth = await ctx.modelRegistry.getApiKeyAndHeaders(model);
-	if (!auth.ok || !auth.apiKey) {
-		throw new Error(auth.ok ? `No API key for ${model.provider}` : auth.error);
+	if (!ctx.modelRegistry.hasConfiguredAuth(model)) {
+		throw new Error(
+			`No credentials configured for ${model.provider}. Log in with /login or set an API key for this provider.`,
+		);
 	}
 
 	const userMessage: UserMessage = {
@@ -149,16 +150,10 @@ async function callModel(
 		timestamp: Date.now(),
 	};
 
-	const response = await complete(
+	const response = await ctx.modelRegistry.complete(
 		model,
 		{ systemPrompt: SYSTEM_PROMPT, messages: [userMessage] },
-		{
-			apiKey: auth.apiKey,
-			headers: auth.headers,
-			env: auth.env,
-			signal,
-			cacheRetention: "none",
-		},
+		{ signal, cacheRetention: "none" },
 	);
 
 	if (response.stopReason === "aborted") {
